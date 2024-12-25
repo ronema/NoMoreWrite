@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            margin: 0;
+            padding: 20px;
+            overflow-y: auto;
+        }
+
+        /* 自定义滚动条样式 */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: rgba(0, 0, 0, 0.1);
+            border-radius: 3px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(0, 0, 0, 0.2);
+        }
+
+        .industry-selector {
+            margin-bottom: 24px;
+            position: relative;
+        }
+
+        #industry-select {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            background-color: #fff;
+            font-size: 14px;
+            color: #333;
+            appearance: none;  /* 移除默认的下拉箭头 */
+            cursor: pointer;
+            transition: all 0.2s ease;
+            background-image: url("data:image/svg+xml,%3Csvg width='10' height='6' viewBox='0 0 10 6' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1L5 5L9 1' stroke='%23666' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 16px center;
+            padding-right: 40px;
+        }
+
+        #industry-select:hover {
+            border-color: #18a0fb;
+            background-color: #f8f9fa;
+        }
+
+        #industry-select:focus {
+            border-color: #18a0fb;
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(24, 160, 251, 0.1);
+        }
+
+        .type-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .type-button {
+            padding: 8px 12px;
+            border: 1px solid #e0e0e0;
+            border-radius: 6px;
+            background-color: #fff;
+            color: #333;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-align: center;
+        }
+
+        .type-button:hover {
+            background-color: #f5f5f5;
+            border-color: #18a0fb;
+            color: #18a0fb;
+        }
+
+        .type-button.active {
+            background-color: #18a0fb;
+            border-color: #18a0fb;
+            color: white;
+        }
+
+        .section {
+            display: none;
+            flex-direction: column;
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        .section[data-industry] {
+            display: none;
+        }
+
+        .section[data-industry="all"],
+        .section[data-industry].active {
+            display: flex;
+        }
+
+        .section-title {
+            font-size: 14px;
+            color: #666;
+            margin: 0 0 8px 4px;
+            font-weight: 500;
+        }
+
+        .status {
+            font-size: 12px;
+            color: #666;
+            text-align: center;
+            min-height: 16px;
+            padding: 4px 0;
+        }
+
+        /* 添加标签样式 */
+        .select-label {
+            font-size: 12px;
+            color: #666;
+            margin-bottom: 8px;
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <main>
+        <div class="industry-selector">
+            <label for="industry-select" class="select-label">选择行业类型</label>
+            <select id="industry-select">
+                <option value="all">全部</option>
+                <option value="basic" selected>常用信息</option>
+                <option value="device">物联行业</option>
+                <option value="finance">金融信息</option>
+                <option value="product">电商行业</option>
+                <option value="user">用户行为</option>
+                <option value="social">社交账号</option>
+            </select>
+        </div>
+
+        <div class="section" data-industry="all basic">
+            <div class="type-grid">
+                <button class="type-button" data-type="name">姓名</button>
+                <button class="type-button" data-type="amount">金额</button>
+                <button class="type-button" data-type="number">数字</button>
+                <button class="type-button" data-type="sequence">序号</button>
+                <button class="type-button" data-type="date">日期时间</button>
+                <button class="type-button" data-type="phone">手机号</button>
+                <button class="type-button" data-type="address">地址</button>
+                <button class="type-button" data-type="email">邮箱</button>
+                <button class="type-button" data-type="ethnicity">民族</button>
+                <button class="type-button" data-type="gender">性别</button>
+                <button class="type-button" data-type="age">年龄</button>
+                <button class="type-button" data-type="province_city">省市区</button>
+                <button class="type-button" data-type="id">身份证</button>
+                <button class="type-button" data-type="community">小区名称</button>
+                <button class="type-button" data-type="website">网站地址</button>
+                <button class="type-button" data-type="university">大学</button>
+                <button class="type-button" data-type="major">学科</button>
+                <button class="type-button" data-type="ip">IP地址</button>
+                <button class="type-button" data-type="mac">MAC地址</button>
+                <button class="type-button" data-type="uuid">唯一标识码</button>
+            </div>
+        </div>
+
+        <div class="section" data-industry="all device">
+            <div class="section-title">物联行业</div>
+            <div class="type-grid">
+                <button class="type-button" data-type="device_name">设备名称</button>
+                <button class="type-button" data-type="device_model">设备型号</button>
+                <button class="type-button" data-type="device_id">设备编号</button>
+                <button class="type-button" data-type="device_type">产品类型</button>
+                <button class="type-button" data-type="protocol">接入协议</button>
+                <button class="type-button" data-type="data_format">数据格式</button>
+                <button class="type-button" data-type="frequency">通信频率</button>
+                <button class="type-button" data-type="status">状态描述</button>
+            </div>
+        </div>
+
+        <div class="section" data-industry="all finance">
+            <div class="section-title">金融信息</div>
+            <div class="type-grid">
+                <button class="type-button" data-type="account_name">账户名称</button>
+                <button class="type-button" data-type="account_id">账户编号</button>
+                <button class="type-button" data-type="transaction">交易记录</button>
+                <button class="type-button" data-type="balance">余额</button>
+                <button class="type-button" data-type="amount">收支金额</button>
+                <button class="type-button" data-type="invoice">发票号</button>
+                <button class="type-button" data-type="payment">支付方式</button>
+            </div>
+        </div>
+
+        <div class="section" data-industry="all product">
+            <div class="section-title">电商行业</div>
+            <div class="type-grid">
+                <button class="type-button" data-type="product_name">商品名称</button>
+                <button class="type-button" data-type="product_id">商品编号</button>
+                <button class="type-button" data-type="price">商品价格</button>
+                <button class="type-button" data-type="stock">库存数量</button>
+                <button class="type-button" data-type="promotion">促销信息</button>
+                <button class="type-button" data-type="tracking">物流单号</button>
+                <button class="type-button" data-type="shipping_address">配送地址</button>
+            </div>
+        </div>
+
+        <div class="section" data-industry="all user">
+            <div class="section-title">用户行为</div>
+            <div class="type-grid">
+                <button class="type-button" data-type="user_id">用户ID</button>
+                <button class="type-button" data-type="user_level">用户等级</button>
+                <button class="type-button" data-type="active_time">活跃时间</button>
+                <button class="type-button" data-type="comment">评论内容</button>
+                <button class="type-button" data-type="likes">点赞数量</button>
+                <button class="type-button" data-type="visit_log">访问记录</button>
+            </div>
+        </div>
+
+        <div class="section" data-industry="all social">
+            <div class="section-title">社交账号</div>
+            <div class="type-grid">
+                <button class="type-button" data-type="username">用户名</button>
+                <button class="type-button" data-type="nickname">昵称</button>
+                <button class="type-button" data-type="qq">QQ号</button>
+                <button class="type-button" data-type="wechat">微信</button>
+            </div>
+        </div>
+
+        <div class="status" id="status"></div>
+    </main>
+
+    <script>
+        document.getElementById('industry-select').addEventListener('change', function(event) {
+            const selectedIndustry = event.target.value;
+            document.querySelectorAll('.section[data-industry]').forEach(section => {
+                if (selectedIndustry === 'all' || section.dataset.industry.includes(selectedIndustry)) {
+                    section.classList.add('active');
+                } else {
+                    section.classList.remove('active');
+                }
+            });
+        });
+
+        document.querySelectorAll('.type-button').forEach(button => {
+            button.addEventListener('click', () => {
+                const type = button.dataset.type;
+                const industry = document.getElementById('industry-select').value;
+                parent.postMessage({ pluginMessage: { type: 'fill-text', contentType: type, industry: industry } }, '*');
+            });
+        });
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const industrySelect = document.getElementById('industry-select');
+            industrySelect.value = 'basic';
+            industrySelect.dispatchEvent(new Event('change'));
+        });
+    </script>
+</body>
+</html>
