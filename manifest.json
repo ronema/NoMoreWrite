@@ -1,6 +1,6 @@
 {
   "name": "NoMoreWrite",
-  "id": "1234567890",
+  "id": "1457627612338741564",
   "api": "1.0.0",
   "main": "code.js",
   "ui": "ui.html",
@@ -9,5 +9,9 @@
   ],
   "permissions": [
     "currentuser"
-  ]
+  ],
+  "networkAccess": {
+    "allowedDomains": ["none"]
+  },
+  "documentAccess": "dynamic-page"
 }
