@@ -130,11 +130,83 @@
             margin-bottom: 8px;
             display: block;
         }
+
+        /* Tab栏样式 */
+        .tab-bar {
+            display: flex;
+            margin-bottom: 16px;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .tab-button {
+            flex: 1;
+            padding: 12px;
+            border: none;
+            background: none;
+            color: #666;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            border-bottom: 2px solid transparent;
+        }
+
+        .tab-button:hover {
+            color: #18a0fb;
+        }
+
+        .tab-button.active {
+            color: #18a0fb;
+            border-bottom-color: #18a0fb;
+        }
+
+        /* 自定义输入区域 */
+        .custom-input {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        #custom-text {
+            width: 100%;
+            height: 400px;
+            padding: 12px;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            resize: none;
+            font-size: 14px;
+        }
+
+        #custom-text:focus {
+            outline: none;
+            border-color: #18a0fb;
+            box-shadow: 0 0 0 3px rgba(24, 160, 251, 0.1);
+        }
+
+        #fill-custom {
+            padding: 12px;
+            background-color: #18a0fb;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: background-color 0.2s ease;
+        }
+
+        #fill-custom:hover {
+            background-color: #1490eb;
+        }
     </style>
 </head>
 <body>
     <main>
-        <div class="industry-selector">
+        <div class="tab-bar">
+            <button class="tab-button active" data-tab="default">默认</button>
+            <button class="tab-button" data-tab="custom">自定义</button>
+        </div>
+        
+        <div class="tab-content" data-tab="default">
+            <div class="industry-selector">
             <label for="industry-select" class="select-label">选择行业类型</label>
             <select id="industry-select">
                 <option value="all">全部</option>
@@ -234,6 +306,15 @@
             </div>
         </div>
 
+        </div>
+
+        <div class="tab-content" data-tab="custom" style="display: none;">
+            <div class="custom-input">
+                <textarea id="custom-text" placeholder="请输入自定义文本，点击回车可进行换行，换行后将按照第一行一一对应填充"></textarea>
+                <button id="fill-custom">填充</button>
+            </div>
+        </div>
+
         <div class="status" id="status"></div>
     </main>
 
@@ -257,10 +338,43 @@
             });
         });
 
+        // Tab切换功能
+        document.querySelectorAll('.tab-button').forEach(button => {
+            button.addEventListener('click', () => {
+                // 移除所有tab的active状态
+                document.querySelectorAll('.tab-button').forEach(btn => {
+                    btn.classList.remove('active');
+                });
+
+                // 设置当前tab为active
+                button.classList.add('active');
+
+                // 隐藏所有内容区域
+                document.querySelectorAll('.tab-content').forEach(content => {
+                    content.style.display = 'none';
+                });
+
+                // 显示当前tab对应的内容
+                const tab = button.dataset.tab;
+                document.querySelector(`.tab-content[data-tab="${tab}"]`).style.display = 'block';
+            });
+        });
+
+        // 自定义文本填充功能
+        document.getElementById('fill-custom').addEventListener('click', () => {
+            const customText = document.getElementById('custom-text').value;
+            if (customText.trim()) {
+                parent.postMessage({ pluginMessage: { type: 'fill-text', contentType: 'custom', text: customText } }, '*');
+            }
+        });
+
         document.addEventListener('DOMContentLoaded', function() {
             const industrySelect = document.getElementById('industry-select');
             industrySelect.value = 'basic';
             industrySelect.dispatchEvent(new Event('change'));
+            
+            // 默认显示第一个tab的内容
+            document.querySelector('.tab-button.active').click();
         });
     </script>
 </body>
