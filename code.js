@@ -507,32 +507,34 @@ figma.showUI(__html__, {
 figma.ui.onmessage = async (msg) => {
     if (msg.type === 'fill-text') {
         // 处理自定义文本
-            if (msg.contentType === 'custom') {
-                const nodes = figma.currentPage.selection;
-                if (nodes.length > 0) {
-                    // 按换行符拆分多行文本并过滤空行
-                    const lines = msg.text.split('\n').filter(line => line.trim() !== '');
-                    
-                    // 如果有有效行才进行填充
-                    if (lines.length > 0) {
-                        // 遍历选中的节点
-                        let lineIndex = 0;
-                        for (const node of nodes) {
-                            if (node.type === "TEXT") {
-                                await figma.loadFontAsync(node.fontName);
-                                // 填充当前行并递增索引
-                                node.characters = lines[lineIndex] || '';
+        if (msg.contentType === 'custom') {
+            const nodes = figma.currentPage.selection;
+            if (nodes.length > 0) {
+                // 按换行符拆分多行文本并过滤空行
+                const lines = msg.text.split('\n').filter(line => line.trim() !== '');
+                
+                // 如果有有效行才进行填充
+                if (lines.length > 0) {
+                    let lineIndex = 0;
+                    for (const node of nodes) {
+                        if (node.type === "TEXT") {
+                            await figma.loadFontAsync(node.fontName);
+                            // 直接使用当前行的文本
+                            node.characters = lines[lineIndex];
+                            lineIndex = (lineIndex + 1) % lines.length;
+                        } else {
+                            // 处理所有容器类型节点，传递正确的参数
+                            await traverseNode(node, 'custom', null, lines, lineIndex);
+                            // 更新行索引，考虑容器内的文本已被填充
+                            if (node.findAll(n => n.type === "TEXT").length > 0) {
                                 lineIndex = (lineIndex + 1) % lines.length;
-                                console.log(`Filled node with line ${lineIndex}: ${lines[lineIndex]}`);
-                            } else {
-                                // 处理所有容器类型节点
-                                await traverseNode(node, 'custom', null, true, lineIndex, lines);
                             }
                         }
                     }
                 }
-                return;
             }
+            return;
+        }
 
         // 如果是序号类型，且是第一次选择，重置计数器
         if (msg.contentType === 'sequence') {
@@ -553,7 +555,7 @@ figma.ui.onmessage = async (msg) => {
     }
 };
 
-async function traverseNode(node, contentType, industry, customText = null, lineIndex = 0, lines = []) {
+async function traverseNode(node, contentType, industry, lines = [], lineIndex = 0) {
     // 处理所有可能包含子节点的类型
     const nodeTypesWithChildren = ['FRAME', 'GROUP', 'INSTANCE', 'COMPONENT', 'SECTION', 'AUTO_LAYOUT'];
     
@@ -561,29 +563,19 @@ async function traverseNode(node, contentType, industry, customText = null, line
         for (const child of node.children) {
             if (child.type === "TEXT") {
                 await figma.loadFontAsync(child.fontName);
-                if (customText && lines.length > 0) {
-                    // 如果有自定义文本且存在有效行，按行循环填充
-                    child.characters = lines[lineIndex] || '';
+                if (contentType === 'custom' && lines.length > 0) {
+                    // 使用当前行填充文本
+                    child.characters = lines[lineIndex];
                     lineIndex = (lineIndex + 1) % lines.length;
-                    console.log(`Filled node with line ${lineIndex}: ${lines[lineIndex]}`);
-                } else if (customText) {
-                    // 如果只有customText标志但没有lines，保持原内容
-                    continue;
-                } else {
-                    // 否则生成随机内容
+                } else if (contentType !== 'custom') {
+                    // 使用生成器生成内容
                     child.characters = generateContent(contentType, industry);
                 }
             } else if (nodeTypesWithChildren.includes(child.type)) {
-                // 递归处理子节点，传递当前行索引
-                await traverseNode(child, contentType, industry, customText, lineIndex, lines);
-            } else if (child.type === "AUTO_LAYOUT") {
-                // 特殊处理自动布局容器
-                if (child.children && child.children.length > 0) {
-                    for (const autoChild of child.children) {
-                        await traverseNode(autoChild, contentType, industry, customText, lineIndex, lines);
-                    }
-                }
+                // 递归处理子节点
+                lineIndex = await traverseNode(child, contentType, industry, lines, lineIndex);
             }
         }
     }
+    return lineIndex;
 }
